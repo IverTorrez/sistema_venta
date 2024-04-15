@@ -1,0 +1,20 @@
+ELIMINACION DE VENTA
+Fecha que se inicio la modificacion 06-06-2022
+Archivos a modificar
+tabla_reportes_ventas.php
+reporte-ventas.php
+venta.modelo.php --para actualizar la consulta y muestre los activos
+venta.controlador.php
+venta.modelo.php 
+
+*************************
+script para crear un nuevo campo en tb_venta
+Para guardar el codigo de la persona que leimino el registro y fecha
+
+Se modifico la tabla tb_ciere_caja
+
+modificar el archivo respaldos/myphp-backup.php para generar backup
+
+RUTA PARA COPIAR EL ALERT SWIT2
+C:\AppServ\www\proyecto_sonido\vistas\plugins
+

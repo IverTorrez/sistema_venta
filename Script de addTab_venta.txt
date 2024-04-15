@@ -1,0 +1,58 @@
+1.-
+ALTER TABLE tb_venta 
+ ADD usuario_baja int DEFAULT 0
+
+
+2.-
+ALTER TABLE tb_venta 
+ ADD fecha_baja datetime
+
+3.-
+ALTER TABLE tb_cierre_caja
+  ADD estado varchar(10)
+
+4.-
+ALTER TABLE tb_cierre_caja 
+ADD id_usuario_alta int
+
+5.-
+ALTER TABLE tb_cierre_caja 
+ADD fecha_alta datetime
+
+6.-
+ALTER TABLE tb_cierre_caja 
+ADD id_usuario_baja  int DEFAULT 0
+
+7.-
+ALTER TABLE tb_cierre_caja 
+ADD fecha_baja datetime
+
+7.5 .-
+ALTER TABLE tb_cierre_caja 
+ADD cantidad_productos int
+
+8.- creacion de tabla
+CREATE TABLE tb_cierre_caja_venta (
+id_cierre_caja_venta int PRIMARY KEY AUTO_INCREMENT,
+id_cierre_caja       int,
+id_venta             int,
+estado               varchar(10),
+id_empleado          int,
+id_admin             int,
+fecha_accion         date,
+fecha_alta           datetime,
+id_admin_baja        int,
+fecha_baja           datetime
+ 
+);
+
+9 ALTER TABLE tb_empleado 
+ADD permiso_especial int
+
+9 alter tabla tb_producto
+alter TABLE tb_producto ADD tipo_reg varchar(10)
+alter TABLE tb_producto ADD usuario_alta int
+alter TABLE tb_producto ADD fecha_alta datetime
+alter TABLE tb_producto ADD usuario_baja int
+alter TABLE tb_producto ADD fecha_baja datetime
+

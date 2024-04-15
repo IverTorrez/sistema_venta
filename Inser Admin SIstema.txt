@@ -1,0 +1,2 @@
+insert into tb_administrador (nombre_administrador,apellido_administrador,telefono_administrador,user_admin,password_admin,estado_admin,observacion_admin) 
+VALUES ('Admin','administrador',67676787,'admin123','admin123','Activo','Es el administrador del sistema')

@@ -1,0 +1,215 @@
+CREATE TABLE tb_cliente(
+id_cliente int PRIMARY KEY AUTO_INCREMENT,
+nombre_cliente varchar(50),
+apellido_cliente varchar(50),
+telefono_cliente int,
+estado_cliente varchar(20),
+observacion text
+);
+
+CREATE TABLE tb_empleado(
+id_empleado int PRIMARY KEY AUTO_INCREMENT,
+nombre_empleado varchar(50),
+apellido_empleado varchar(50),
+telefono_empleado int,
+user_name_emp varchar(50),
+password_emp varchar(50),
+estado_empleado varchar(20),
+observacion_emp text,
+permiso_especial int
+);
+
+CREATE TABLE tb_administrador(
+id_administrador int PRIMARY KEY AUTO_INCREMENT,
+nombre_administrador varchar(50),
+apellido_administrador varchar(50),
+telefono_administrador int,
+user_admin varchar(50),
+password_admin varchar(50),
+estado_admin varchar(20),
+observacion_admin text
+);
+
+CREATE TABLE tb_proveedor(
+id_proveedor int PRIMARY KEY AUTO_INCREMENT,
+nombre_proveedor varchar(50),
+apellido_proveedor varchar(50),
+telefono_proveedor int,
+estado_proveedor varchar(20),
+observacion text
+);
+
+CREATE TABLE tb_categoria(
+id_categoria int PRIMARY KEY AUTO_INCREMENT,
+nombre_categoria varchar(50),
+estado_cat varchar(20)
+);
+
+CREATE TABLE tb_marca(
+id_marca int PRIMARY KEY AUTO_INCREMENT,
+nombre_marca varchar(50),
+estado_marca varchar(20)
+);
+
+CREATE TABLE tb_precio_factura(
+id_precio_factura int PRIMARY KEY AUTO_INCREMENT,
+porcentaje_p_nofacturado int,
+porcentaje_p_facturado int,
+id_administrador int,
+FOREIGN KEY(id_administrador) REFERENCES tb_administrador(id_administrador)
+);
+
+CREATE TABLE tb_producto(
+id_producto int PRIMARY KEY AUTO_INCREMENT,
+nombre_producto varchar(100),
+codigo_producto varchar(50),
+descripcion varchar(200),
+stok_facturado int,
+stock_simple int,
+
+estado_producto varchar(20),
+id_marca int,
+id_categoria int,
+tipo_reg varchar(10),
+usuario_alta int,
+fecha_alta datetime,
+usuario_baja int,
+fecha_baja datetime,
+fecha_modificacion datetime,
+FOREIGN KEY(id_marca) REFERENCES tb_marca(id_marca),
+FOREIGN KEY(id_categoria) REFERENCES tb_categoria(id_categoria)
+);
+
+CREATE TABLE tb_cierre_caja(
+id_cierre_caja int PRIMARY KEY AUTO_INCREMENT,
+fecha_cierre datetime,
+monto_venta_cierre DECIMAL(30, 2),
+monto_caja DECIMAL(30, 2),
+monto_sobrante DECIMAL(30, 2),
+cantidad_ventas int,
+codigos_ventas text,
+id_empleado int,
+
+estado varchar(10),
+id_usuario_alta int,
+fecha_alta datetime,
+id_usuario_baja  int,
+fecha_baja datetime,
+cantidad_productos int,
+FOREIGN KEY(id_empleado) REFERENCES tb_empleado(id_empleado)
+);
+
+CREATE TABLE tb_compra(
+id_compra int PRIMARY KEY AUTO_INCREMENT,
+fecha_compra datetime,
+monto_compra DECIMAL(30, 2),
+compra_facturada varchar(10),
+costo_factura DECIMAL(30, 2),
+usuario_alta int,
+id_proveedor int,
+estado varchar(10),
+tipo_reg varchar(10),
+usuario_baja int,
+fecha_baja datetime,
+FOREIGN KEY(id_proveedor) REFERENCES tb_proveedor(id_proveedor)
+);
+
+CREATE TABLE tb_compra_producto(
+id_compra_producto int PRIMARY KEY AUTO_INCREMENT,
+subtotal_compra DECIMAL(30, 2),
+cantidad_compra int,
+id_compra int,
+id_producto int,
+precio_unit_compra varchar(30),
+precio_unit_compraFacturado DECIMAL(30, 2),
+precio_venta_prod DECIMAL(30, 2),
+precio_venta_prod_Fact DECIMAL(30, 2),
+stock_actual int,
+precio_tope decimal(30,2),	
+estado varchar(10),
+FOREIGN KEY(id_compra) REFERENCES tb_compra(id_compra),
+FOREIGN KEY(id_producto) REFERENCES tb_producto(id_producto)
+);
+
+CREATE TABLE tb_venta(
+id_venta int PRIMARY KEY AUTO_INCREMENT,
+fecha_venta datetime,
+monto_venta DECIMAL(30, 2),
+venta_facturada varchar(20),
+precio_facturaV DECIMAL(30, 2),
+tipo_venta varchar(20),
+id_empleado int,
+estado varchar(10),
+usuario_baja  int,
+fecha_baja datetime,
+FOREIGN KEY(id_empleado) REFERENCES tb_empleado(id_empleado)
+);
+
+CREATE TABLE tb_venta_producto(
+id_venta_producto int PRIMARY KEY AUTO_INCREMENT,
+codigo_prod varchar(50),
+subtotal_venta DECIMAL(30, 2),
+cantidad_prod int,
+ventaP_facturada varchar(10),
+precio_factura DECIMAL(30, 2),
+id_compra_producto  int,
+id_venta int,
+precio_unitario_venta DECIMAL(30, 2),
+precio_compra_prod DECIMAL(30, 2),
+precio_venta_establecido DECIMAL(30, 2),
+estado varchar(10),
+FOREIGN KEY(id_compra_producto ) REFERENCES tb_compra_producto(id_compra_producto ),
+FOREIGN KEY(id_venta) REFERENCES tb_venta(id_venta)
+);
+
+CREATE TABLE tb_venta_cliente(
+id_venta_cliente int PRIMARY KEY AUTO_INCREMENT,
+id_cliente int,
+id_venta int,
+FOREIGN KEY(id_cliente) REFERENCES tb_cliente(id_cliente),
+FOREIGN KEY(id_venta) REFERENCES tb_venta(id_venta)
+);
+
+CREATE TABLE tb_sucursal(
+id_sucursal int PRIMARY KEY AUTO_INCREMENT,
+nombre_suc  varchar(50),
+descripcion_suc varchar(100),
+contacto   varchar(50),
+estado_suc varchar(10)
+);
+
+
+CREATE TABLE tb_transferencia_stock_envio(
+id_transferencia_envio   int PRIMARY KEY AUTO_INCREMENT,
+fecha_transferencia_enviada  datetime,
+cantidad_envio int,
+estado   varchar(20),
+id_compra_producto int,
+descripcion_trans_envio varchar(200),
+id_sucursal_destino  int
+);
+
+CREATE TABLE tb_transferencia_stock_recibido(
+    id_transferencia_recibido int PRIMARY KEY AUTO_INCREMENT,
+    fecha_trn_recibido        datetime,
+    id_compra_producto        int,
+    cantidad_recibida         int,
+    estado_recibida           varchar(10),
+    descripcion_recibido      varchar(200),
+    id_sucursal_origen        int,
+    codigo_de_envio           int
+);
+
+CREATE TABLE tb_cierre_caja_venta (
+id_cierre_caja_venta int PRIMARY KEY AUTO_INCREMENT,
+id_cierre_caja       int,
+id_venta             int,
+estado               varchar(10),
+id_empleado          int,
+id_admin             int,
+fecha_accion         date,
+fecha_alta           datetime,
+id_admin_baja        int,
+fecha_baja           datetime
+ 
+);
