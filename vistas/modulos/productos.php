@@ -446,12 +446,12 @@ if ($_SESSION["usuarioEmp"]!="")
 
 <script type="text/javascript">
   $(document).ready(function() { 
-   $("#btnguardarprod").on('click', function() {
+   $("#btnguardarprod").on('click',async function() {
   
    var formDataProd = new FormData(); 
    
    var nuevoNombre=$('#nuevoNombre').val();
-   var nuevoCodigo=$('#nuevoCodigo').val();
+   var nuevoCodigo=$('#nuevoCodigo').val().replace(/\s+/g, '');
    var nuevoDescripcion=$('#nuevoDescripcion').val();
  
    var selectNuevoMarca=$('#selectNuevoMarca').val();
@@ -460,14 +460,17 @@ if ($_SESSION["usuarioEmp"]!="")
    var tipo_user=$('#tipo_user').val();
    var idUsuario=$('#idUsuario').val();
    var btnguardarprod=$('#btnguardarprod').val();
-    
+   const pasoValidacion=await pasoValidacionCamposDeFormularioProducto();
+   console.log(pasoValidacion);
   
    if ( (nuevoNombre=='') ||  (nuevoCodigo=='')||  (nuevoDescripcion=='')|| (selectNuevoMarca=='') ||  (selectNuevoCateg=='') ||  (selectNuevoalmacen=='') ) 
    {
      setTimeout(function(){  }, 2000); swal('ATENCION','Deve de completar todos los campos','warning'); 
      
-     
    }
+   else if (!pasoValidacion) {
+      swal('ATENCION','El código del producto ya existe registrado','warning'); 
+    }
    else
    {
      /*cargamos las nueva variables a a los parametros que se enviara al archivo php que registra*/
@@ -481,34 +484,30 @@ if ($_SESSION["usuarioEmp"]!="")
      formDataProd.append('btnguardarprod',btnguardarprod);
      formDataProd.append('selectNuevoalmacen',selectNuevoalmacen);
      
-      $.ajax({ url: 'controladores/productos.controlador.php', 
-               type: 'post', 
-               data: formDataProd, 
-               contentType: false, 
-               processData: false, 
-               success: function(response) { 
-                console.info(response);
-                //    var posOk=response[1];
-                //    var posIdpregunta=response[4];
-                //    console.info(posIdpregunta);
-                  if (response==1) 
-                  {
-                    
-                    setTimeout(function(){ location.href='productos'; }, 1000); swal('EXELENTE','','success'); 
-                     
-                  }
-                  else
-                  {
-                    setTimeout(function(){  }, 2000); swal('ERROR','Intente nuevamente','error');
-                                       
-                  } 
-                }
-            }); 
+     try {
+        const response = await $.ajax({
+          url: 'controladores/productos.controlador.php', 
+          type: 'POST', 
+          data: formDataProd, 
+          contentType: false, 
+          processData: false
+        });
+        
+        console.info(response);
+        if (response == 1) {
+          setTimeout(function(){ location.href='productos'; }, 1000); 
+          swal('EXCELENTE','','success'); 
+        } else {
+          setTimeout(function(){  }, 2000); 
+          swal('ERROR','Intente nuevamente','error');
+        } 
+      } catch (error) {
+        console.error("Error en la solicitud AJAX:", error);
+        swal('ERROR','Hubo un problema con la solicitud','error');
+      }
 
       }/*FIN DEL ELSE QUE SE EJECTUTA AL CONFIRMAR QUE TODOS LOS CAMPOS FUERON LLENADOS*/
         return false;
-
-
     }); 
   });
 
@@ -519,14 +518,14 @@ if ($_SESSION["usuarioEmp"]!="")
 
 /*===================FUNCION QUE LLAMA AL EDITAR EMPLEADO===========================================*/
 $(document).ready(function() { 
-   $("#btneditprod").on('click', function() {
+   $("#btneditprod").on('click',async function() {
   
    var formDataeditProd = new FormData(); 
    
    var btneditprod=$('#btneditprod').val();
    var idprodedit=$('#idprodedit').val();
    var editNombre=$('#editNombre').val();
-   var editCodigo=$('#editCodigo').val();
+   var editCodigo=$('#editCodigo').val().replace(/\s+/g, '');
    var editDescripcion=$('#editDescripcion').val();
    
    var selecteditMarca=$('#selecteditMarca').val();
@@ -534,7 +533,7 @@ $(document).ready(function() {
    var selecteditalmacen=$('#selecteditalmacen').val();
    var tipo_user_edit=$('#tipo_user_edit').val();
    var idUsuario_edit=$('#idUsuario_edit').val();
-   
+   const pasoValidacion= await pasoValidacionCamposDeFormularioProductoEditar()
   
    if ( (editNombre=='') ||  (editCodigo=='')||  (editDescripcion=='') || (selecteditMarca=='') ||  (selecteditCateg=='') ||  (selecteditalmacen=='') ) 
    {
@@ -542,6 +541,9 @@ $(document).ready(function() {
      
      
    }
+   else if (!pasoValidacion) {
+      swal('ATENCION','El código del producto ya existe registrado','warning'); 
+    }
    else
    {
      /*cargamos las nueva variables a a los parametros que se enviara al archivo php que registra*/
@@ -689,6 +691,66 @@ $(document).ready(function() {
 
     }); 
   });
+
+  async function pasoValidacionCamposDeFormularioProducto() {
+  var nuevoCodigo = $('#nuevoCodigo').val().replace(/\s+/g, '');
+  var pasoValidacion = true;
+
+  try {
+    const respuesta = await $.ajax({
+      url: "ajax/obtenerProductoPorCodigoBarra.php",
+      data: { "nuevoCodigo": nuevoCodigo },
+      method: "GET",
+      cache: false,
+      dataType: "json",
+    });
+
+    console.log('reessss', respuesta);
+    if (respuesta == 1) {
+      pasoValidacion = false;
+    } else {
+      pasoValidacion = true;
+    }
+  } catch (error) {
+    console.error("Error en la solicitud AJAX:", error);
+    pasoValidacion = false; // Maneja el error como creas conveniente
+  }
+  console.log('devolvio', pasoValidacion);
+  return pasoValidacion;
+}
+
+
+async function pasoValidacionCamposDeFormularioProductoEditar() {
+  var idprodedit=$('#idprodedit').val();
+   var editCodigo=$('#editCodigo').val().replace(/\s+/g, '');
+
+  var pasoValidacion = true;
+
+  try {
+    const respuesta = await $.ajax({
+      url: "ajax/obtenerProductoCodigoBarraId.php",
+      data: { "editCodigo": editCodigo,
+               "idprodedit": idprodedit 
+       },
+      method: "GET",
+      cache: false,
+      dataType: "json",
+    });
+
+    console.log('reessss', respuesta);
+    if (respuesta == 1) {
+      pasoValidacion = false;
+    } else {
+      pasoValidacion = true;
+    }
+  } catch (error) {
+    console.error("Error en la solicitud AJAX:", error);
+    pasoValidacion = false; // Maneja el error como creas conveniente
+  }
+  console.log('devolvio', pasoValidacion);
+  return pasoValidacion;
+}
+
 
 </script>
 

@@ -13,8 +13,9 @@ include_once("modelos/compraProducto.modelo.php");
     <section class="content-header">
       <h1>
         Lista de Productos
-        <small>Panel de control</small><input type="hidden" name="texttipouser" id="texttipouser" value="<?php echo $_SESSION['tipouser'] ?>">
+        <input type="hidden" name="texttipouser" id="texttipouser" value="<?php echo $_SESSION['tipouser'] ?>">
         <input type="hidden" name="textiduser" id="textiduser" value="<?php echo $iduseractual; ?>">
+        
       </h1>
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Inicio</a></li>
@@ -116,7 +117,7 @@ include_once("modelos/compraProducto.modelo.php");
                 <!--  <td><?php echo $fila->precio_tope; ?></td> -->
                  
 
-                 <td><input type="number" id="<?php echo $fila->idcompraprod; ?>" name="<?php echo $fila->idcompraprod; ?>"></td>
+                 <td><input type="number" id="<?php echo $fila->idcompraprod; ?>" name="<?php echo $fila->idcompraprod; ?>" placeholder="Cantidad"></td>
                  <td><button class="btn btn-success btn-xs agregarProducto recuperarBoton" data-id="<?php echo $fila->idcompraprod ?>">Agregar <i class="fa  fa-plus"></i> </button> </td>
                <!--   <td>
                    <div class="btn-group">
@@ -171,7 +172,7 @@ include_once("modelos/compraProducto.modelo.php");
                     <input type="checkbox" name="checkfact" id="checkfact" > Venta Facturada
                   </label>
                 </div>
-
+  <small>CODIGO:</small>  <input type="text" name="" id="miInput" value="" autofocus placeholder="CODIGO PRODUCTO">
     <div class="form-group row " id="" >
 
      
@@ -270,124 +271,114 @@ include_once("modelos/compraProducto.modelo.php");
    $(".tablaProductos").on("click","button.agregarProducto",function(){
     
   var id=$(this).attr("data-id");/*obtenemos el dato que cargamos en el campo 'data-id'  */
-  //console.log(id);
-
-  
+  let cantidad_ingresada_venta=$("#"+id+"").val();//obtenemos la cantidad ingresada en el listado, antes de oprimir el boton Agregar
+  $("#"+id+"").val('');//dejamos vacio el campo de cantidad ingresada por el clientes antes de presionar Agregar
+  //console.log(id);  
   //$(this).removeClass("btn-success agregarProducto");// se elimina la clase para que ya no pueda agregar el mismo producto
   //$(this).addClass("btn-defaul");//se le da el color por defecto con una clase nueva
+   generarTablaDetalleVenta(id,cantidad_ingresada_venta)
   
-   $.ajax({
+ });
+
+async function generarTablaDetalleVenta(id,cantidaIngresada){
+  try{
+
+    $.ajax({
     url:"ajax/cargartablaProducto.php",
     data:{"idcompraprod":id},
     type:"POST",
     cache: false,
-    //contentType: false,
-    //processData: false,
     dataType:"json",
     success:function(respuesta){
-     //$("#nuevoProducto").html(respuesta);
+      console.log(respuesta)
      let id_compra_producto=respuesta["id_compra_producto"];
      let nombre_producto=respuesta["nombrePrduct"];
      let codigo_producto=respuesta["codProduct"];
      let precio_venta=respuesta["precioVentaprod"];
      let precio_facturado=respuesta["precioVentaProdFact"];
-   //  console.log('id', id_compra_producto);
-     // let precio_tope=respuesta["precio_tope"];
-     // let stok_facturado=respuesta["stok_facturado"];
-     // let stock_simple=respuesta["stock_simple"];
      let stockTotal=respuesta["stockActual"];
-     let cantidad_ingresada=$("#"+id+"").val();//obtenemos la cantidad ingresada en el listado, antes de oprimir el boton Agregar
-     $("#"+id+"").val('');//dejamos vacio el campo de cantidad
-     // parseInt(stock_simple)+parseInt(stok_facturado);
-    //  console.log(respuesta);
+     let cantidad_ingresada=cantidaIngresada;//obtenemos la cantidad ingresada en el listado, antes de oprimir el boton Agregar
+      //PREGUNTAMOS SI LA CANTIDAD INGRESADA ES MAYOR A CERO
+      if (parseInt(cantidad_ingresada)>0) 
+      {
+        $("#btnguardarventa").css("display", "block");/*mostramos el boton guardar venta*/
    
-    //PREGUNTAMOS SI LA CANTIDAD INGRESADA ES MAYOR A CERO
-    if (parseInt(cantidad_ingresada)>0) 
-    {
-       $("#btnguardarventa").css("display", "block");/*mostramos el boton guardar venta*/
-   // }//fin cuando se la cabtidad ingresada es mayor a cero
+            // CARGAMOS EL ID DEL PRODUCTO AL ARRAYDE PRODUCTOS SELECCIONADOS
 
-// CARGAMOS EL ID DEL PRODUCTO AL ARRAYDE PRODUCTOS SELECCIONADOS
-
-   //PREGUNTAMOS SI EL NUEVO ID YA ESTA EN EL ARRAYIDPRODUCTOSVENTA
-   if (arrayIdproductosVenta.includes(id)) 
-     {
-      //setTimeout(function(){  }, 2000); swal('Este producto ya existe en la venta actual','','info');
-      //SI EL PRODUCTO SELECCIONADO YA EXISTE EN LA LISTA DE PRODUCTOS PARA LA VENTA ACTUAL, SOLO AUMENTAMOS LA CANTIDAD
-      var cantidad_anterior=$("#txtcantidad"+id+"").val();//obtenemos la cantidad que anteriormente selecciono para sumarle la nueva cantidad
-      var cantidad_sumada=parseInt(cantidad_anterior)+parseInt(cantidad_ingresada); //sumamos la cantidad anterior mas la cantidad ingresada
-      $("#txtcantidad"+id+"").val(cantidad_sumada);
-
-       calculosubtotal(cantidad_sumada,id,precio_venta,stockTotal);//hacemos el calculo con la cantidad sumada
-     }
-     else//por falso, crea una nueva fila para el producto
-     {
-       //creamos una constante para obtener de manera aleatoria del rango de 1 al 10
-        const randomNumberInRange=(min,max)=>
-       Math.floor(Math.random()*(max-min))+min;
-       var numberrandon=randomNumberInRange(1,10);
-       var colorfila='';
-       switch (numberrandon){
-         case 1:colorfila='#F68B86'; break;
-         case 2:colorfila='#FFA130'; break;
-         case 3:colorfila='#FFF230'; break;
-         case 4:colorfila='#CDFF5A'; break;
-         case 5:colorfila='#5AFFA3'; break;
-         case 6:colorfila='#5AFFEB'; break;
-         case 7:colorfila='#5F99FF'; break;
-         case 8:colorfila='#FF84F6'; break;
-         case 9:colorfila='#FFBDBD'; break;
-         case 10:colorfila='#D2D0D1'; break;
-         default:colorfila='';
+       //PREGUNTAMOS SI EL NUEVO ID YA ESTA EN EL ARRAYIDPRODUCTOSVENTA
+       if (arrayIdproductosVenta.includes(id)) 
+       {
+        //SI EL PRODUCTO SELECCIONADO YA EXISTE EN LA LISTA DE PRODUCTOS PARA LA VENTA ACTUAL, SOLO AUMENTAMOS LA CANTIDAD
+        var cantidad_anterior=$("#txtcantidad"+id+"").val();//obtenemos la cantidad que anteriormente selecciono para sumarle la nueva cantidad
+        var cantidad_sumada=parseInt(cantidad_anterior)+parseInt(cantidad_ingresada); //sumamos la cantidad anterior mas la cantidad ingresada
+        $("#txtcantidad"+id+"").val(cantidad_sumada);
+        calculosubtotal(cantidad_sumada,id,precio_venta,stockTotal);//hacemos el calculo con la cantidad sumada
        }
+       else//por falso, crea una nueva fila para el producto
+       {
+          //creamos una constante para obtener de manera aleatoria del rango de 1 al 10
+         const randomNumberInRange=(min,max)=>
+         Math.floor(Math.random()*(max-min))+min;
+         var numberrandon=randomNumberInRange(1,10);
+         var colorfila='';
+          switch (numberrandon){
+            case 1:colorfila='#F68B86'; break;
+            case 2:colorfila='#FFA130'; break;
+            case 3:colorfila='#FFF230'; break;
+            case 4:colorfila='#CDFF5A'; break;
+            case 5:colorfila='#5AFFA3'; break;
+            case 6:colorfila='#5AFFEB'; break;
+            case 7:colorfila='#5F99FF'; break;
+            case 8:colorfila='#FF84F6'; break;
+            case 9:colorfila='#FFBDBD'; break;
+            case 10:colorfila='#D2D0D1'; break;
+            default:colorfila='';
+          }
 
-    arrayIdproductosVenta.push(id);
-    arrayPrecioOficialProducto.push(precio_venta);/*cargamos en un array los precios oficiales de los productos*/
-    arrayPrecioOficialFacturadoProducto.push(precio_facturado);/*cargamos en un array los precios oficiales facturados de los productos*/
-   // console.log(arrayIdproductosVenta);
-
-        $(".nuevoProducto").append(
+          arrayIdproductosVenta.push(id);
+          arrayPrecioOficialProducto.push(precio_venta);/*cargamos en un array los precios oficiales de los productos*/
+          arrayPrecioOficialFacturadoProducto.push(precio_facturado);/*cargamos en un array los precios oficiales facturados de los productos*/
+         $(".nuevoProducto").append(
        
-    '<tr style="background:'+colorfila+';">'+
-  '<!--producto-->'+
+         '<tr style="background:'+colorfila+';">'+
+          '<!--producto-->'+
 
-     '<td>'+nombre_producto+' </td>'+
-     '<td>'+codigo_producto+'</td>'+
-     '<td>'+precio_venta+' <input type="hidden" id="txtprecioProd'+id+'" name="txtprecioProd'+id+'" value="'+precio_venta+'"></td>'+
+            '<td>'+nombre_producto+' </td>'+
+            '<td>'+codigo_producto+'</td>'+
+            '<td>'+precio_venta+' <input type="hidden" id="txtprecioProd'+id+'" name="txtprecioProd'+id+'" value="'+precio_venta+'"></td>'+
 
-     '<td>'+precio_facturado+' <input type="hidden" id="txtprecioProdFact'+id+'" name="txtprecioProdFact'+id+'" value="'+precio_facturado+'"></td>'+
+            '<td>'+precio_facturado+' <input type="hidden" id="txtprecioProdFact'+id+'" name="txtprecioProdFact'+id+'" value="'+precio_facturado+'"></td>'+
+            '<td> <input type="text" id="txtidenti'+id+'" name="txtidenti'+id+'"> </td> '+
 
-     // '<td></td> '+
-     '<td> <input type="text" id="txtidenti'+id+'" name="txtidenti'+id+'"> </td> '+
+            '<td> <input type="number" id="txtcantidad'+id+'" oninput="calculosubtotal(this.value,'+id+','+precio_venta+','+stockTotal+')" name="nuevaCantidadProducto" min="1" value="'+cantidad_ingresada+'"  class="nuevaCantidadProducto" idcompraprod="nuevaCantidadProducto"> </td> '+
+  
+            '<td> <input type="text" class="nuevoPrecio" name="preciovendido" id="precVenta'+id+'" oninput="sumarTotalPrecio()" precioReal="'+precio_venta+'" value="'+precio_venta+'" > </td>'+
 
-     '<td> <input type="number" id="txtcantidad'+id+'" oninput="calculosubtotal(this.value,'+id+','+precio_venta+','+stockTotal+')" name="nuevaCantidadProducto" min="1" value="'+cantidad_ingresada+'"  class="nuevaCantidadProducto" idcompraprod="nuevaCantidadProducto"> </td> '+
-
-    
-     '<td> <input type="text" class="nuevoPrecio" name="preciovendido" id="precVenta'+id+'" oninput="sumarTotalPrecio()" precioReal="'+precio_venta+'" value="'+precio_venta+'" > </td>'+
-
-     '<td><button class="btn btn-danger btn-xs quitarProducto" idcompraprod="'+id+'" precioOficialProd="'+precio_venta+'" precioOficialFactProd="'+precio_facturado+'">Eliminar</button></td>'+
+            '<td><button class="btn btn-danger btn-xs quitarProducto" idcompraprod="'+id+'" precioOficialProd="'+precio_venta+'" precioOficialFactProd="'+precio_facturado+'">Eliminar</button></td>'+
  
-'</tr>')
-     calculosubtotal(cantidad_ingresada,id,precio_venta,stockTotal);//hacemos el calculo con la cantidad ingresada
-     sumarTotalPrecio();
-    }/*FIN DEL ELSE CUANDO NO EXISTE EL ID EN EL ARRAYIDPRODUCTOSVENTA*/
- }//fin cuando se la cabtidad ingresada es mayor a cero
- else
- {
-   swal({
-             title:"Ingrese una cantidad mayor a cero",
-             text: "",
-             type: "error",
-             confirmButtonText: "¡Cerrar!"
-        });
- }
-//ejecutarfunciondedecalculo();/*funcion que se ejecuta para calcular monto total*/
+         '</tr>')
+        calculosubtotal(cantidad_ingresada,id,precio_venta,stockTotal);//hacemos el calculo con la cantidad ingresada
+        sumarTotalPrecio();
+      }/*FIN DEL ELSE CUANDO NO EXISTE EL ID EN EL ARRAYIDPRODUCTOSVENTA*/
+    }//fin cuando se la cabtidad ingresada es mayor a cero
+    else
+    {
+      swal({
+                title:"Ingrese una cantidad mayor a cero",
+                text: "",
+                type: "error",
+                confirmButtonText: "¡Cerrar!"
+            });
+    }
+
     }//fin del success
+
    })
 
- });
-
-
+  }catch(error){
+    console.error("Error:", error);
+  }
+}
 
 
 
@@ -863,6 +854,167 @@ function comprobarPrecioCorectoEnVentaFacturada()
 /*=========================================================================================
 FIN DE FUNCION QUE COMPRUEBA SI LOS PRODUCTOS SE ESTAN VENDIENDO CON EL PRECIO CORRECTO
 =========================================================================================*/
+const miInput = document.getElementById('miInput');
+
+miInput.addEventListener('input', function(event) {
+    // Acción a realizar cuando cambian los valores en el input
+    if(miInput.value.length===13)
+    {
+      obtenerDatosCompraPorCodigoBarra(miInput.value)
+      /*console.log('El valor del input ha cambiado:', miInput.value);
+      var codigoBarra=miInput.value;
+      $.ajax({
+       url:"ajax/obtenerCompraProductoCodigoBarra.php",
+       data:{"codigoBarra":codigoBarra},
+       method:"GET",
+       cache: false,
+       dataType:"json",
+       success:function(respuesta){
+        console.log(respuesta);
+        if(respuesta>1){
+          limpiarInputCodigoProducto();
+          return swal({
+                           title:"Mas de una compra registrada",
+                            text: "Este producto tiene mas de una compra registrada, seleccione manualmente el producto para la venta",
+                            type: "warning",
+                            confirmButtonText: "¡Cerrar!"
+                            });
+            
+        }
+        else{ 
+           if(respuesta==0){
+            limpiarInputCodigoProducto();
+              return swal({
+                           title:"Stock vacio",
+                            text: "Este producto tiene stock vacio",
+                            type: "warning",
+                            confirmButtonText: "¡Cerrar!"
+                            });
+                            
+              }
+              else{
+                console.log('se cargara a la tabla');
+                limpiarInputCodigoProducto();
+              }
+
+        }
+       
+      }
+     })*/
+     
+    }
+ 
+   
+});
+
+async function obtenerDatosCompraPorCodigoBarra(codigoBarra){
+   try {
+     console.log('El valor del input ha cambiado:', codigoBarra);
+      var codigoBarra=codigoBarra;
+      $.ajax({
+       url:"ajax/obtenerCompraProductoCodigoBarra.php",
+       data:{"codigoBarra":codigoBarra},
+       method:"GET",
+       cache: false,
+       dataType:"json",
+       success:function(respuesta){
+        console.log(respuesta);
+        if(respuesta>1){
+          limpiarInputCodigoProducto();
+          return swal({
+                           title:"Mas de una compra registrada",
+                            text: "Este producto tiene mas de una compra registrada, seleccione manualmente el producto para la venta",
+                            type: "warning",
+                            confirmButtonText: "¡Cerrar!"
+                            });
+            
+        }
+        else{ 
+           if(respuesta==0){
+            limpiarInputCodigoProducto();
+              return swal({
+                           title:"Stock vacio",
+                            text: "Este producto tiene stock vacio o el producto no existe",
+                            type: "warning",
+                            confirmButtonText: "¡Cerrar!"
+                            });
+                            
+              }
+              else{
+                let idcompraprod=respuesta.idcompraprod;
+                let cantidad=1;
+                generarTablaDetalleVenta(idcompraprod,cantidad)
+                console.log('se cargara a la tabla',respuesta.idcompraprod);
+                limpiarInputCodigoProducto();
+              }
+
+        }
+       
+      }
+     })
+   } catch (error) {
+      
+   }
+}
+
+
+
+async function obtenerDatosProducto(codigobarra) {
+    // Simular una espera de 1 segundo (puedes reemplazar esto con una operación asíncrona real, como una solicitud HTTP)
+  
+   // if(miInput.value.length===13)
+   // {
+     // console.log('El valor del input ha cambiado:');
+   // }
+    // Simular datos obtenidos
+    var resultadoConsulta;
+    $.ajax({
+       url:"ajax/obtenerCompraProductoCodigoBarra.php",
+       data:{"codigoBarra":codigobarra},
+       type:"GET",
+       cache: false,
+       //contentType: false,
+       //processData: false,
+       dataType:"json",
+       success:function(respuesta){
+        console.log(respuesta);
+        resultadoConsulta=respuesta;
+      }
+  })
+    var result=codigobarra;
+    return { resultado: resultadoConsulta };
+}
+
+function limpiarInputCodigoProducto() {
+    var miInput = document.getElementById('miInput');
+    miInput.value = "";
+}
+
+// Función asíncrona que simula una operación asíncrona (por ejemplo, una solicitud HTTP)
+async function obtenerDatos() {
+    // Simular una espera de 1 segundo (puedes reemplazar esto con una operación asíncrona real, como una solicitud HTTP)
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Simular datos obtenidos
+    return { resultado: 'Datos obtenidos' };
+}
+
+// Función principal que llama a la función asíncrona
+async function principal(codigobarra) {
+   // console.log('Inicio de la función principal');
+
+    // Llamar a la función asíncrona y esperar a que se complete
+    const datos = await obtenerDatosProducto(codigobarra);
+
+    console.log('Datos obtenidos:', datos);
+    limpiarInputCodigoProducto();
+   // console.log('Fin de la función principal');
+}
+
+// Llamar a la función principal
+//principal();
+
+
 </script>
 
 
