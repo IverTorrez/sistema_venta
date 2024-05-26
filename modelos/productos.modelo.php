@@ -354,6 +354,25 @@ WHERE tb_marca.id_marca=tb_producto.id_marca AND tb_categoria.id_categoria=tb_pr
 		$sql="SELECT nombre_producto,codigo_producto,descripcion, stok_facturado,stock_simple,usuario_alta,usuario_baja,estado_producto FROM tb_producto WHERE id_producto=$idprod ";
 		return parent::ejecutar($sql);
 	}
+	public function mostrarProductoPorCodigoBarra($codigoBarra){
+		$sql="SELECT p.id_producto,
+		             p.codigo_producto
+		        FROM tb_producto as p
+			   WHERE p.codigo_producto='$codigoBarra'
+			     AND p.estado_producto='Activo' ";
+		return parent::ejecutar($sql);
+
+	}
+	public function mostrarProductoPorCodigoBarraId($codigoBarra,$id){
+		$sql="SELECT p.id_producto,
+		             p.codigo_producto
+		        FROM tb_producto as p
+			   WHERE p.codigo_producto='$codigoBarra'
+			   AND p.id_producto<>$id
+			   AND p.estado_producto='Activo' ";
+		return parent::ejecutar($sql);
+
+	}
 	
 
 	

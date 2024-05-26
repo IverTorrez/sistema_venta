@@ -247,7 +247,15 @@ if ($_SESSION["usuarioEmp"]!="")
               <label>Precio de venta del producto (precio para la venta)</label>
               <div class="input-group">
                   <span class="input-group-addon"><i class="fa  fa-money"></i></span>
-                 <input type="text" class="form-control input-lx" name="nuevoCostoVenta" id="nuevoCostoVenta" placeholder="Ingresar precio de venta" required="" autocomplete="off">
+                 <input 
+                   type="text" 
+                   class="form-control input-lx" 
+                   name="nuevoCostoVenta" 
+                   id="nuevoCostoVenta" 
+                   placeholder="Ingresar precio de venta" 
+                   required="" 
+                   autocomplete="off" 
+                   onkeyup="colocarPreciosFacturadoyMinimo();">
               </div>  
             </div>
 
@@ -255,7 +263,7 @@ if ($_SESSION["usuarioEmp"]!="")
               <label>Precio venta facturado del producto (precio para la venta)</label>
               <div class="input-group">
                   <span class="input-group-addon"><i class="fa  fa-money"></i></span>
-                 <input type="text" class="form-control input-lx" name="nuevoCostoVFact" id="nuevoCostoVFact" placeholder="Ingresar precio de venta facturada" required="" autocomplete="off">
+                 <input type="text" class="form-control input-lx" name="nuevoCostoVFact" id="nuevoCostoVFact" placeholder="Ingresar precio de venta facturada" required="" autocomplete="off" readonly>
               </div>  
             </div>
 
@@ -263,7 +271,7 @@ if ($_SESSION["usuarioEmp"]!="")
               <label>Precio ultimo de producto (precio minimo para venta)</label>
               <div class="input-group">
                   <span class="input-group-addon"><i class="fa  fa-money"></i></span>
-                 <input type="text" class="form-control input-lx" name="nuevoCostoTope" id="nuevoCostoTope" placeholder="Ingresar precio de venta tope" required="" autocomplete="off">
+                 <input type="text" class="form-control input-lx" name="nuevoCostoTope" id="nuevoCostoTope" placeholder="Ingresar precio de venta tope" required="" autocomplete="off" readonly>
               </div>  
             </div>
 
@@ -284,6 +292,16 @@ if ($_SESSION["usuarioEmp"]!="")
           }
          
         }
+
+        function colocarPreciosFacturadoyMinimo()
+        {
+          var costoPorUnidad=0;
+          var precioVenta=document.getElementById('nuevoCostoVenta').value;
+                    
+          document.getElementById('nuevoCostoVFact').value=precioVenta
+          document.getElementById('nuevoCostoTope').value=precioVenta
+        }
+        
       </script>    
 
            <!-- <div class="form-group">

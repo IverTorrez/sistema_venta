@@ -74,7 +74,7 @@ class Precio_Factura extends Conexion{
 	public function mostrarLosPreciosFactura()
 	{
 		$sql="SELECT id_precio_factura, porcentaje_p_nofacturado,porcentaje_p_facturado, FROM tb_precio_factura WHERE id_precio_factura=1";
-		return parent::ejecutar($sql)
+		return parent::ejecutar($sql);
 	}
 
 	

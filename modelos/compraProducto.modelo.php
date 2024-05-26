@@ -307,6 +307,43 @@ WHERE tb_producto.id_producto=tb_compra_producto.id_producto AND tb_compra_produ
 			 return false;
 
 	}
+	public function obtenerProductoPorCodigoBarra($codigoBarra)
+	{
+		$sql="SELECT (tb_compra_producto.id_compra_producto)as idcompraprod, 
+						(tb_producto.nombre_producto)as mombreProducto,
+						(tb_producto.codigo_producto)as codigoProducto,
+						(tb_producto.descripcion)as prodDescripsion,
+						(tb_marca.nombre_marca)as marcaProd,
+						(tb_categoria.nombre_categoria)as catProd,
+						(tb_compra_producto.stock_actual)as stokactual,
+						(tb_compra_producto.precio_venta_prod)as precioVentaprod,
+						(tb_compra_producto.precio_venta_prod_Fact)as precioVentaprodFact 
+				FROM tb_compra_producto,
+						tb_producto,
+						tb_marca,
+						tb_categoria 
+				WHERE tb_marca.id_marca=tb_producto.id_marca 
+					AND tb_categoria.id_categoria=tb_producto.id_categoria 
+					AND tb_producto.id_producto=tb_compra_producto.id_producto 
+					AND tb_compra_producto.stock_actual>0 
+					AND tb_compra_producto.estado='Activo'
+					AND tb_producto.codigo_producto=$codigoBarra";
+		return parent::ejecutar($sql);
+	}
+	public function mostrarDetallesDeProductoDeUnaCOmpraPorCodigoBarra($idcompra)
+	{
+		$sql="SELECT id_compra_producto, 
+		             (tb_producto.nombre_producto)AS nombrePrduct,
+					 (tb_producto.codigo_producto)AS codProduct,
+					 (tb_compra_producto.precio_venta_prod)AS precioVentaprod, 
+					 (tb_compra_producto.precio_venta_prod_Fact)AS precioVentaProdFact,
+					 (tb_compra_producto.stock_actual)AS stockActual 
+                FROM tb_compra_producto,
+				     tb_producto
+               WHERE tb_producto.id_producto=tb_compra_producto.id_producto 
+			     AND tb_compra_producto.id_compra_producto=$idcompra";
+         return parent::ejecutar($sql);
+	}
 
 	
 
